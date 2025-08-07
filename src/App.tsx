@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import GameMenu from './components/GameMenu';
 import TicTacToe from './components/TicTacToe';
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -11,7 +11,7 @@ const TicTacToe = () => {
   const [currentPlayer, setCurrentPlayer] = useState<Player>('X');
   const [gameStatus, setGameStatus] = useState<GameStatus>('playing');
   const [winner, setWinner] = useState<Player | null>(null);
-  const [playerNames, setPlayerNames] = useState({ X: 'Player X', O: 'Player O' });
+  const [playerNames] = useState({ X: 'Player X', O: 'Player O' });
 
   const winningCombinations = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
