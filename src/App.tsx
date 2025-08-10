@@ -4,7 +4,12 @@ import TicTacToe from './components/TicTacToe';
 
 function App() {
   return (
-    <Router>
+    <Router
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true
+      }}
+    >
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
         <Routes>
           <Route path="/" element={<GameMenu />} />

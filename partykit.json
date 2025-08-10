@@ -1,0 +1,8 @@
+{
+  "name": "games-partykit",
+  "main": "partykit/tic_tac_toe.ts",
+  "parties": {
+    "tic_tac_toe": "partykit/tic_tac_toe.ts"
+  },
+  "compatibilityDate": "2025-08-10"
+} 
