@@ -45,12 +45,14 @@ export default class TicTacToeRoom implements Party.Server {
 
   async onConnect(ws: Party.Connection) {
     const playerId = ws.id;
+    console.log('🔌 Player connecting:', playerId);
     this.connections.set(playerId, ws);
     
     // Check if player already exists (reconnecting)
     let playerInfo = this.gameState.players.find(p => p.id === playerId);
     if (playerInfo) {
       playerInfo.connected = true;
+      console.log('🔄 Player reconnecting:', playerInfo);
     } else {
       // Add new player to the room
       playerInfo = {
@@ -60,15 +62,21 @@ export default class TicTacToeRoom implements Party.Server {
         connected: true
       };
       this.gameState.players.push(playerInfo);
+      console.log('➕ New player added:', playerInfo);
     }
     
     // Assign symbols to connected players
     const connectedPlayers = this.gameState.players.filter(p => p.connected);
+    console.log('👥 Connected players before symbol assignment:', connectedPlayers);
+    
     this.gameState.players.forEach(p => p.symbol = null);
     if (connectedPlayers[0]) connectedPlayers[0].symbol = 'X';
     if (connectedPlayers[1]) connectedPlayers[1].symbol = 'O';
     
+    console.log('🎯 Symbols assigned:', this.gameState.players.map(p => ({ id: p.id, symbol: p.symbol, connected: p.connected })));
+    
     this.gameState.gameStatus = connectedPlayers.length >= 2 ? 'playing' : 'waiting';
+    console.log('🎮 Game status:', this.gameState.gameStatus, 'Current player:', this.gameState.currentPlayer);
     
     // Send welcome message with player ID
     ws.send(JSON.stringify({
@@ -90,6 +98,8 @@ export default class TicTacToeRoom implements Party.Server {
     try {
       const data: GameMessage = JSON.parse(message);
       const playerId = ws.id;
+      
+      console.log('📨 Message received:', { type: data.type, playerId, data });
       
       switch (data.type) {
         case 'join':
@@ -148,14 +158,32 @@ export default class TicTacToeRoom implements Party.Server {
   }
 
   private handleMove(playerId: string, index: number) {
+    console.log('🎯 Move attempt:', { playerId, index, gameStatus: this.gameState.gameStatus });
+    
     const player = this.gameState.players.find(p => p.id === playerId);
-    if (!player || !player.connected || this.gameState.gameStatus !== 'playing') return;
+    console.log('👤 Player found:', player);
+    
+    if (!player || !player.connected || this.gameState.gameStatus !== 'playing') {
+      console.log('❌ Move rejected:', { 
+        playerExists: !!player, 
+        connected: player?.connected, 
+        gameStatus: this.gameState.gameStatus 
+      });
+      return;
+    }
     
     // Check if it's the player's turn
-    if (this.gameState.currentPlayer !== player.symbol) return;
+    console.log('🔄 Turn check:', { currentPlayer: this.gameState.currentPlayer, playerSymbol: player.symbol });
+    if (this.gameState.currentPlayer !== player.symbol) {
+      console.log('❌ Not player turn');
+      return;
+    }
     
     // Check if the cell is empty
-    if (this.gameState.board[index] !== null) return;
+    if (this.gameState.board[index] !== null) {
+      console.log('❌ Cell not empty');
+      return;
+    }
     
     // Make the move
     this.gameState.board[index] = player.symbol!;

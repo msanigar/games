@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, RotateCcw, Trophy, Users, Gamepad2, Crown, X, Circle, Copy } from 'lucide-react';
@@ -88,12 +88,23 @@ const TicTacToe = () => {
   };
 
   const handleCellClick = (index: number) => {
-    if (gameState.board[index] || gameState.gameStatus !== 'playing') return;
+    console.log('🎯 Cell clicked:', { index, gameStatus: gameState.gameStatus, currentPlayer: gameState.currentPlayer });
+    
+    if (gameState.board[index] || gameState.gameStatus !== 'playing') {
+      console.log('❌ Cell click rejected:', { cellOccupied: !!gameState.board[index], gameStatus: gameState.gameStatus });
+      return;
+    }
     
     // Only allow moves if it's your turn and you have a symbol
     const me = gameState.players.find(p => p.id === myPlayerId);
-    if (!me || me.symbol !== gameState.currentPlayer) return;
+    console.log('👤 My player info:', { me, myPlayerId, players: gameState.players });
     
+    if (!me || me.symbol !== gameState.currentPlayer) {
+      console.log('❌ Move rejected:', { playerExists: !!me, mySymbol: me?.symbol, currentPlayer: gameState.currentPlayer });
+      return;
+    }
+    
+    console.log('✅ Sending move:', { type: 'move', index });
     // Send move to server
     send({
       type: 'move',
@@ -112,14 +123,7 @@ const TicTacToe = () => {
     navigator.clipboard.writeText(roomLink);
   };
 
-  // Update my player ID when players change
-  useEffect(() => {
-    if (gameState.players.length > 0 && !myPlayerId) {
-      // For demo purposes, assume the first player is "me"
-      // In a real implementation, you'd get this from the server
-      setMyPlayerId(gameState.players[0].id);
-    }
-  }, [gameState.players, myPlayerId]);
+  // Remove the problematic useEffect that was overriding the server-assigned player ID
 
   const Cell = ({ value, index }: { value: Player | null; index: number }) => (
     <motion.button
