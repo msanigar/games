@@ -66,9 +66,13 @@ export const usePartyKit = ({
 
     const cid = getClientId();
     const base = import.meta.env.DEV
-      ? `ws://localhost:1999/tic-tac-toe/${room}`
+      ? `ws://localhost:1999/tic_tac_toe/${room}`
       : `wss://${import.meta.env.VITE_PARTYKIT_HOST || 'games-partykit.msanigar.partykit.dev'}/parties/tic_tac_toe/${room}`;
     const wsUrl = `${base}?cid=${encodeURIComponent(cid)}`;
+    
+    console.log('🔌 Connecting to:', wsUrl);
+    console.log('🌍 Environment:', import.meta.env.MODE);
+    console.log('🏠 PartyKit Host:', import.meta.env.VITE_PARTYKIT_HOST);
 
     const ws = new WebSocket(wsUrl);
 
@@ -89,7 +93,8 @@ export const usePartyKit = ({
       }
     };
 
-    ws.onclose = () => {
+    ws.onclose = (event) => {
+      console.log('🔌 WebSocket closed:', event.code, event.reason);
       setIsConnected(false);
       setIsConnecting(false);
       connectionAttempted.current = false;
@@ -102,6 +107,7 @@ export const usePartyKit = ({
     };
 
     ws.onerror = (error) => {
+      console.error('❌ WebSocket error:', error);
       setIsConnected(false);
       setIsConnecting(false);
       connectionAttempted.current = false;

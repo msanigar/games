@@ -204,5 +204,5 @@ function broadcastToRoom(roomId, message) {
 const PORT = 1999;
 server.listen(PORT, () => {
   console.log(`🎮 Simple WebSocket server running on port ${PORT}`);
-  console.log(`🌐 WebSocket endpoint: ws://localhost:${PORT}/tic-tac-toe/{roomId}`);
+  console.log(`🌐 WebSocket endpoint: ws://localhost:${PORT}/tic_tac_toe/{roomId}`);
 }); 
