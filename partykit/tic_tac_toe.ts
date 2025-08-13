@@ -77,6 +77,7 @@ export default class TicTacToeRoom implements Party.Server {
     
     this.gameState.gameStatus = connectedPlayers.length >= 2 ? 'playing' : 'waiting';
     console.log('🎮 Game status:', this.gameState.gameStatus, 'Current player:', this.gameState.currentPlayer);
+    console.log('👥 Connected players count:', connectedPlayers.length);
     
     // Send welcome message with player ID
     ws.send(JSON.stringify({
@@ -92,6 +93,12 @@ export default class TicTacToeRoom implements Party.Server {
     
     // Broadcast player list update
     this.broadcastPlayerUpdate();
+    
+    // Also broadcast the updated game state to all players
+    this.broadcast({
+      type: 'gameState',
+      gameState: this.gameState
+    });
   }
 
   async onMessage(message: string, ws: Party.Connection) {
@@ -266,6 +273,7 @@ export default class TicTacToeRoom implements Party.Server {
   }
 
   private broadcastPlayerUpdate() {
+    console.log('📢 Broadcasting player update:', this.gameState.players.map(p => ({ id: p.id, symbol: p.symbol, connected: p.connected, name: p.name })));
     this.broadcast({
       type: 'playerUpdate',
       players: this.gameState.players
