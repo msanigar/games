@@ -59,8 +59,11 @@ const TicTacToe = () => {
     room: roomId,
     enabled: !!playerName,
     onMessage: (message) => {
+      console.log('📨 Message received:', message.type, message);
+      
       switch (message.type) {
         case 'welcome':
+          console.log('👋 Welcome message:', message.playerId);
           setMyPlayerId(message.playerId as string);
           // If we already have a name, send it now
           if (playerName) {
@@ -70,9 +73,11 @@ const TicTacToe = () => {
         case 'gameState':
         case 'move':
         case 'reset':
+          console.log('🎮 Game state update:', message.gameState);
           setGameState(message.gameState as GameState);
           break;
         case 'playerUpdate':
+          console.log('👥 Player update:', message.players);
           setGameState(prev => ({ ...prev, players: message.players as PlayerInfo[] }));
           break;
       }
@@ -97,10 +102,22 @@ const TicTacToe = () => {
     
     // Only allow moves if it's your turn and you have a symbol
     const me = gameState.players.find(p => p.id === myPlayerId);
-    console.log('👤 My player info:', { me, myPlayerId, players: gameState.players });
+    console.log('👤 My player info:', { 
+      me, 
+      myPlayerId, 
+      players: gameState.players,
+      gameStatus: gameState.gameStatus,
+      currentPlayer: gameState.currentPlayer
+    });
     
     if (!me || me.symbol !== gameState.currentPlayer) {
-      console.log('❌ Move rejected:', { playerExists: !!me, mySymbol: me?.symbol, currentPlayer: gameState.currentPlayer });
+      console.log('❌ Move rejected:', { 
+        playerExists: !!me, 
+        mySymbol: me?.symbol, 
+        currentPlayer: gameState.currentPlayer,
+        gameStatus: gameState.gameStatus,
+        allPlayers: gameState.players.map(p => ({ id: p.id, symbol: p.symbol, connected: p.connected, name: p.name }))
+      });
       return;
     }
     
